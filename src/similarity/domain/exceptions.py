@@ -1,0 +1,4 @@
+
+
+class InvalidKnowledgeBaseName(Exception):
+    ...

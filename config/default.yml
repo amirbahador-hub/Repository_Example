@@ -6,3 +6,8 @@ uvicorn:
   workers: 1
   limit_concurrency: 7
   limit_max_requests: 50
+
+redis:
+  host: "localhost"
+  port: 6379
+  db: 0

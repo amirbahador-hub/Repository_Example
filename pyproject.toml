@@ -13,8 +13,9 @@ dependencies = [
     "memoization>=0.4.0",
     "omegaconf>=2.3.0",
     "uvicorn>=0.27.1",
+    "dependency-injector>=4.41.0",
 ]
-requires-python = "==3.12.*"
+requires-python = "==3.11.*"
 readme = "README.md"
 license = {text = "MIT"}
 

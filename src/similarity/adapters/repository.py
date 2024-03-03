@@ -1,59 +1,23 @@
-import abc
-from typing import Set
-from allocation.adapters import orm
-from allocation.domain import model
+from redis.asyncio import Redis as AsyncRedis
+from redis.commands.json.path import Path
+from similarity.domain.exceptions import InvalidKnowledgeBaseName
+from similarity.domain.models import KnowledgeBase
 
 
-class AbstractRepository(abc.ABC):
-    def __init__(self):
-        self.seen = set()  # type: Set[model.Product]
+class RedisRepository:
+    def __init__(self, redis: AsyncRedis):
+        self.redis = redis 
 
-    def add(self, product: model.Product):
-        self._add(product)
-        self.seen.add(product)
+    async def add(self, knowledge_base: KnowledgeBase):
+        await self.redis.json().set(f"knowledge_bases:{knowledge_base.name}", ".", [])
+        return knowledge_base
 
-    def get(self, sku) -> model.Product:
-        product = self._get(sku)
-        if product:
-            self.seen.add(product)
-        return product
+    async def delete(self, name):
+        members = await self._get_by_name(name)
+        if not isinstance(members, list):
+            raise InvalidKnowledgeBaseName("Knowledge Base Dosen't Exists")
+        await self.redis.json().delete(f"knowledge_bases:{name}")
+        return name
 
-    def get_by_batchref(self, batchref) -> model.Product:
-        product = self._get_by_batchref(batchref)
-        if product:
-            self.seen.add(product)
-        return product
-
-    @abc.abstractmethod
-    def _add(self, product: model.Product):
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def _get(self, sku) -> model.Product:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def _get_by_batchref(self, batchref) -> model.Product:
-        raise NotImplementedError
-
-
-class SqlAlchemyRepository(AbstractRepository):
-    def __init__(self, session):
-        super().__init__()
-        self.session = session
-
-    def _add(self, product):
-        self.session.add(product)
-
-    def _get(self, sku):
-        return self.session.query(model.Product).filter_by(sku=sku).first()
-
-    def _get_by_batchref(self, batchref):
-        return (
-            self.session.query(model.Product)
-            .join(model.Batch)
-            .filter(
-                orm.batches.c.reference == batchref,
-            )
-            .first()
-        )
+    async def _get_by_name(self, name: str):
+        return await self.redis.json().get(f"knowledge_bases:{name}")

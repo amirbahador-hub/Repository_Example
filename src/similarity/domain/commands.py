@@ -1,29 +1,29 @@
 # pylint: disable=too-few-public-methods
 from datetime import date
 from typing import Optional
+from pydantic import BaseModel, validator
+from fastapi import Depends
 from dataclasses import dataclass
 
+from similarity.domain.types import KnowledgeBaseName
+from similarity.utils import clean_name
 
-class Command:
+
+class Command(BaseModel):
     pass
 
 
 @dataclass
-class Allocate(Command):
-    orderid: str
-    sku: str
-    qty: int
-
-
-@dataclass
-class CreateBatch(Command):
-    ref: str
-    sku: str
-    qty: int
+class AddKnowledgeBase(Command):
+    name: KnowledgeBaseName
     eta: Optional[date] = None
 
 
+    @validator("name")
+    def url_friendly(cls, value, *, values, **kwargs):
+        return clean_name(value)
+
 @dataclass
-class ChangeBatchQuantity(Command):
-    ref: str
-    qty: int
+class RemoveKnowledgeBase(Command):
+    name: KnowledgeBaseName
+
