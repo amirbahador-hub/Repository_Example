@@ -3,7 +3,7 @@ import logging
 from dataclasses import asdict
 import redis
 
-from lib.config import get_config 
+from lib.config import get_config
 from similarity.domain import events
 
 logger = logging.getLogger(__name__)

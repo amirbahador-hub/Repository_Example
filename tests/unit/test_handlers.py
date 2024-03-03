@@ -69,9 +69,7 @@ class TestAddBatch:
         bus = bootstrap_test_app()
         bus.handle(commands.CreateBatch("b1", "GARISH-RUG", 100, None))
         bus.handle(commands.CreateBatch("b2", "GARISH-RUG", 99, None))
-        assert "b2" in [
-            b.reference for b in bus.uow.products.get("GARISH-RUG").batches
-        ]
+        assert "b2" in [b.reference for b in bus.uow.products.get("GARISH-RUG").batches]
 
 
 class TestAllocate:

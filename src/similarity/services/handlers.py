@@ -12,14 +12,34 @@ async def add_knowledge_base(
     cmd: commands.AddKnowledgeBase,
     uow: unit_of_work.AbstractUnitOfWork,
 ):
-    knowledge_base = models.KnowledgeBase.new_instance(cmd)
-    return await uow.repository.add(knowledge_base)
+    async with uow:
+        knowledge_base = models.KnowledgeBase.new_instance(cmd)
+        return await uow.repository.add(knowledge_base)
+
 
 async def remove_knowledge_base(
     cmd: commands.RemoveKnowledgeBase,
     uow: unit_of_work.AbstractUnitOfWork,
 ):
-    return await uow.repository.delete(cmd.name)
+    async with uow:
+        return await uow.repository.delete(cmd.name)
+
+
+async def add_document(
+    cmd: commands.AddDocument,
+    uow: unit_of_work.AbstractUnitOfWork,
+):
+    async with uow:
+        document = models.Document.new_instance(cmd)
+        return await uow.repository.add(document, name=cmd.name)
+
+
+async def remove_document(
+    cmd: commands.RemoveDocument,
+    uow: unit_of_work.AbstractUnitOfWork,
+):
+    async with uow:
+        return await uow.repository.delete(id=cmd.id, name=cmd.name)
 
 
 EVENT_HANDLERS = {
@@ -29,8 +49,8 @@ EVENT_HANDLERS = {
 }  # type: Dict[Type[events.Event], List[Callable]]
 
 COMMAND_HANDLERS = {
-    # commands.Allocate: allocate,
     commands.AddKnowledgeBase: add_knowledge_base,
     commands.RemoveKnowledgeBase: remove_knowledge_base,
-    # commands.ChangeBatchQuantity: change_batch_quantity,
+    commands.AddDocument: add_document,
+    commands.RemoveDocument: remove_document,
 }  # type: Dict[Type[commands.Command], Callable]
