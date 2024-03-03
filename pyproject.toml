@@ -1,0 +1,26 @@
+[project]
+name = "similarity"
+version = "0.1.0"
+description = "Default template for PDM package"
+authors = [
+    {name = "amirbahador", email = "amirbahador.develop@gmail.com"},
+]
+dependencies = [
+    "fastapi>=0.110.0",
+    "redis>=5.0.2",
+    "langchain>=0.1.10",
+    "python-dotenv>=1.0.1",
+    "memoization>=0.4.0",
+    "omegaconf>=2.3.0",
+]
+requires-python = "==3.12.*"
+readme = "README.md"
+license = {text = "MIT"}
+
+
+[tool.pdm]
+distribution = false
+
+
+[tool.pdm.scripts]
+start = "python src/main.py"
