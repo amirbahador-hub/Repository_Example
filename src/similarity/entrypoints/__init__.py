@@ -1,0 +1,1 @@
+from .restapi.knowledge_base import router
