@@ -15,7 +15,7 @@ class RedisAdapter:
         self, name: KnowledgeBaseName, ids: list[DocumentId] | None = None
     ):
         if ids is None:
-            ids = await self._get_knowledge_base_by_name(name)
+            ids = await self.get_documents(name)
             ids = ids if ids is not None else []
         await self.redis.json().set(
             f"knowledge_bases:{name}", ".", [str(id) for id in ids]
@@ -36,20 +36,19 @@ class RedisAdapter:
         document_id = str(document_id)
         if document_id in ids:
             ids.remove(document_id)
-            print(ids)
             await self.add_or_update_knowledge_base(name, ids)
         else:
             raise InvalidDocument("Document Dosen't Exists!")
 
-    async def _get_knowledge_base_by_name(
+    async def get_documents(
         self, name: KnowledgeBaseName
-    ) -> list[KnowledgeBaseName] | None:
+    ) -> list[DocumentId] | None:
         return await self.redis.json().get(f"knowledge_bases:{name}")
 
     async def validate_knowledge_base(
         self, name: KnowledgeBaseName
     ) -> list[DocumentId]:
-        ids = await self._get_knowledge_base_by_name(f"{name}")
+        ids = await self.get_documents(f"{name}")
         if not isinstance(ids, list):
             raise InvalidKnowledgeBaseName("Knowledge Base Dosen't Exists!")
         return ids

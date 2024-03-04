@@ -1,8 +1,9 @@
 # pylint: disable=unused-argument
 from __future__ import annotations
 from typing import List, Dict, Callable, Type, TYPE_CHECKING
+from similarity import adapters
 from similarity.domain import commands, events, models
-from dependency_injector.wiring import inject
+import asyncio
 
 if TYPE_CHECKING:
     from . import unit_of_work
@@ -22,7 +23,14 @@ async def remove_knowledge_base(
     uow: unit_of_work.AbstractUnitOfWork,
 ):
     async with uow:
-        return await uow.repository.delete(cmd.name)
+        document_ids= await uow.repository.get(cmd.name)
+        name = await uow.repository.delete(cmd.name)
+        tasks = [
+            adapters.redis_publisher.publish("document.remove", {"id": id, "name": name})
+            for id in document_ids
+        ]
+        await asyncio.gather(*tasks)
+        return name
 
 
 async def add_document(

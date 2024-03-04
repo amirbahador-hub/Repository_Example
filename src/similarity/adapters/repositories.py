@@ -7,6 +7,9 @@ class KnowledgeBaseRepository:
     def __init__(self, adapter):
         self.adapter: KnowledgeBaseProto = adapter
 
+    async def get(self, name: KnowledgeBaseName) -> list[DocumentId]:
+        return await self.adapter.get_documents(name)
+
     async def add(self, knowledge_base: KnowledgeBase) -> KnowledgeBase:
         await self.adapter.add_knowledge_base(knowledge_base.name)
         return knowledge_base
