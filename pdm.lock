@@ -5,7 +5,22 @@
 groups = ["default"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:91b1056205f939d195ecc822b2b72b9d9987e52fa7b9429a1e435b3968539096"
+content_hash = "sha256:d2b26ee2b44f9772d1a75c1d974aba644e0278de7a415429448d676c07cf30d8"
+
+[[package]]
+name = "aio-pika"
+version = "9.4.0"
+requires_python = ">=3.8,<4.0"
+summary = "Wrapper around the aiormq for asyncio and humans"
+groups = ["default"]
+dependencies = [
+    "aiormq<6.9.0,>=6.8.0",
+    "yarl",
+]
+files = [
+    {file = "aio_pika-9.4.0-py3-none-any.whl", hash = "sha256:06d3680ea8515aa6c02ac6f94ffe2dde3396f141fde92eef63beb98c7a143cfd"},
+    {file = "aio_pika-9.4.0.tar.gz", hash = "sha256:5199be0f50bd0fb1338962390383bb83a3ce8e760bb603aa071e58b56afeeec1"},
+]
 
 [[package]]
 name = "aiohttp"
@@ -37,6 +52,21 @@ files = [
     {file = "aiohttp-3.9.3-cp311-cp311-win32.whl", hash = "sha256:50fca156d718f8ced687a373f9e140c1bb765ca16e3d6f4fe116e3df7c05b2c5"},
     {file = "aiohttp-3.9.3-cp311-cp311-win_amd64.whl", hash = "sha256:5fe9ce6c09668063b8447f85d43b8d1c4e5d3d7e92c63173e6180b2ac5d46dd8"},
     {file = "aiohttp-3.9.3.tar.gz", hash = "sha256:90842933e5d1ff760fae6caca4b2b3edba53ba8f4b71e95dacf2818a2aca06f7"},
+]
+
+[[package]]
+name = "aiormq"
+version = "6.8.0"
+requires_python = ">=3.8,<4.0"
+summary = "Pure python AMQP asynchronous client library"
+groups = ["default"]
+dependencies = [
+    "pamqp==3.3.0",
+    "yarl",
+]
+files = [
+    {file = "aiormq-6.8.0-py3-none-any.whl", hash = "sha256:9a16174dcae4078c957a773d2f02d3dfd6c2fcf12c909dc244333a458f2aeab0"},
+    {file = "aiormq-6.8.0.tar.gz", hash = "sha256:198f9c7430feb7bc491016099a06266dc45880b6b1de3925d410fde6541a66fb"},
 ]
 
 [[package]]
@@ -270,6 +300,22 @@ files = [
 ]
 
 [[package]]
+name = "fooman"
+version = "0.1.1"
+requires_python = ">=3.11"
+summary = "Boost microservices communication with our powerful async RPC library, featuring seamless integration with popular message brokers like Redis, Kafka, and RabbitMQ."
+groups = ["default"]
+dependencies = [
+    "aio-pika>=9.4.0",
+    "pydantic>=2.6.2",
+    "redis>=5.0.1",
+]
+files = [
+    {file = "fooman-0.1.1-py3-none-any.whl", hash = "sha256:4a02de9730cc08ae866a7ea67bec26739822f30d71e33893a670e9508bd7e234"},
+    {file = "fooman-0.1.1.tar.gz", hash = "sha256:3b1af429555622a57343b5b0e80928298a7e10fe45ffe1e03f29642d94e8bbd2"},
+]
+
+[[package]]
 name = "frozenlist"
 version = "1.4.1"
 requires_python = ">=3.8"
@@ -304,6 +350,17 @@ groups = ["default"]
 files = [
     {file = "fsspec-2024.2.0-py3-none-any.whl", hash = "sha256:817f969556fa5916bc682e02ca2045f96ff7f586d45110fcb76022063ad2c7d8"},
     {file = "fsspec-2024.2.0.tar.gz", hash = "sha256:b6ad1a679f760dda52b1168c859d01b7b80648ea6f7f7c7f5a8a91dc3f3ecb84"},
+]
+
+[[package]]
+name = "graphql-core"
+version = "3.2.3"
+requires_python = ">=3.6,<4"
+summary = "GraphQL implementation for Python, a port of GraphQL.js, the JavaScript reference implementation for GraphQL."
+groups = ["default"]
+files = [
+    {file = "graphql-core-3.2.3.tar.gz", hash = "sha256:06d2aad0ac723e35b1cb47885d3e5c45e956a53bc1b209a9fc5369007fe46676"},
+    {file = "graphql_core-3.2.3-py3-none-any.whl", hash = "sha256:5766780452bd5ec8ba133f8bf287dc92713e3868ddd83aee4faab9fc3e303dc3"},
 ]
 
 [[package]]
@@ -840,6 +897,17 @@ files = [
 ]
 
 [[package]]
+name = "pamqp"
+version = "3.3.0"
+requires_python = ">=3.7"
+summary = "RabbitMQ Focused AMQP low-level library"
+groups = ["default"]
+files = [
+    {file = "pamqp-3.3.0-py2.py3-none-any.whl", hash = "sha256:c901a684794157ae39b52cbf700db8c9aae7a470f13528b9d7b4e5f7202f8eb0"},
+    {file = "pamqp-3.3.0.tar.gz", hash = "sha256:40b8795bd4efcf2b0f8821c1de83d12ca16d5760f4507836267fd7a02b06763b"},
+]
+
+[[package]]
 name = "pillow"
 version = "10.2.0"
 requires_python = ">=3.8"
@@ -929,6 +997,20 @@ files = [
     {file = "pydantic_core-2.16.3-pp39-pypy39_pp73-musllinux_1_1_x86_64.whl", hash = "sha256:ed25e1835c00a332cb10c683cd39da96a719ab1dfc08427d476bce41b92531fc"},
     {file = "pydantic_core-2.16.3-pp39-pypy39_pp73-win_amd64.whl", hash = "sha256:86b3d0033580bd6bbe07590152007275bd7af95f98eaa5bd36f3da219dcd93da"},
     {file = "pydantic_core-2.16.3.tar.gz", hash = "sha256:1cac689f80a3abab2d3c0048b29eea5751114054f032a941a32de4c852c59cad"},
+]
+
+[[package]]
+name = "python-dateutil"
+version = "2.9.0.post0"
+requires_python = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
+summary = "Extensions to the standard Python datetime module"
+groups = ["default"]
+dependencies = [
+    "six>=1.5",
+]
+files = [
+    {file = "python-dateutil-2.9.0.post0.tar.gz", hash = "sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3"},
+    {file = "python_dateutil-2.9.0.post0-py2.py3-none-any.whl", hash = "sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427"},
 ]
 
 [[package]]
@@ -1183,6 +1265,22 @@ dependencies = [
 files = [
     {file = "starlette-0.36.3-py3-none-any.whl", hash = "sha256:13d429aa93a61dc40bf503e8c801db1f1bca3dc706b10ef2434a36123568f044"},
     {file = "starlette-0.36.3.tar.gz", hash = "sha256:90a671733cfb35771d8cc605e0b679d23b992f8dcfad48cc60b38cb29aeb7080"},
+]
+
+[[package]]
+name = "strawberry-graphql"
+version = "0.219.2"
+requires_python = ">=3.8,<4.0"
+summary = "A library for creating GraphQL APIs"
+groups = ["default"]
+dependencies = [
+    "graphql-core<3.3.0,>=3.2.0",
+    "python-dateutil<3.0.0,>=2.7.0",
+    "typing-extensions>=4.5.0",
+]
+files = [
+    {file = "strawberry_graphql-0.219.2-py3-none-any.whl", hash = "sha256:6b26994bcf092714dbd6def4c69a36c279fbdbfdc2390fb6294728dd076ba863"},
+    {file = "strawberry_graphql-0.219.2.tar.gz", hash = "sha256:b7a9b3115398402ec04fceb76b0dd3908dd90009cf20d344071be985c039aac7"},
 ]
 
 [[package]]

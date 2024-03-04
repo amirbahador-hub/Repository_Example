@@ -1,6 +1,6 @@
 from similarity.adapters.protocols import DocumentProto, KnowledgeBaseProto
 from similarity.domain.models import Document, KnowledgeBase
-from similarity.domain.types import DocumentId, KnowledgeBaseName
+from similarity.domain.types import DocumentId, KnowledgeBaseName, LongStr
 
 
 class KnowledgeBaseRepository:
@@ -22,6 +22,9 @@ class KnowledgeBaseRepository:
 class DocumentRepository:
     def __init__(self, adapter):
         self.adapter: DocumentProto = adapter
+
+    async def get(self, content: LongStr, name: KnowledgeBaseName):
+        return await self.adapter.get_similarity(query=content, name=name)
 
     async def add(self, document: Document, name: KnowledgeBaseName):
         await self.adapter.add_document(name=name, document=document)

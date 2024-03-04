@@ -1,12 +1,11 @@
-from allocation.service_layer import unit_of_work
+from similarity.domain.models import Document
+from similarity.domain.types import KnowledgeBaseName, LongStr
+from similarity.services import unit_of_work
 
 
-def allocations(orderid: str, uow: unit_of_work.SqlAlchemyUnitOfWork):
-    with uow:
-        results = uow.session.execute(
-            """
-            SELECT sku, batchref FROM allocations_view WHERE orderid = :orderid
-            """,
-            dict(orderid=orderid),
+async def similarity(content: LongStr, name: KnowledgeBaseName, uow: unit_of_work.DocumentPersistenceUnitOfWork) -> list[Document]:
+    async with uow:
+        results = await uow.repository.get(
+            content=content, name=name
         )
-    return [dict(r) for r in results]
+    return results

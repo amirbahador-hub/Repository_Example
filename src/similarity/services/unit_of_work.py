@@ -22,8 +22,6 @@ class KnowledgeBasePersistenceUnitOfWork:
         self.adapter = adapter 
 
     async def __aenter__(self) -> None:
-        # assert isinstance(self.engine, AsyncRedis)
-        # adapter = RedisAdapter(self.engine)
         self.repository = KnowledgeBaseRepository(self.adapter)
 
     async def __aexit__(self, *args) -> None: ...
@@ -36,12 +34,6 @@ class DocumentPersistenceUnitOfWork:
         self.adapter = adapter 
 
     async def __aenter__(self) -> None:
-        # if isinstance(self.engine, AsyncRedis):
-        #     adapter = RedisAdapter(self.engine)
-        # elif isinstance(self.engine, FaissOrm):
-        #     adapter = FaissOrm(self.engine)
-        # else:
-        #     raise Exception(f"Engine {self.engine} is not supported")
         self.repository = DocumentRepository(self.adapter)
 
     async def __aexit__(self, *args) -> None: ...

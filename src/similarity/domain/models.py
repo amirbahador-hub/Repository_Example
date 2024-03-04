@@ -1,8 +1,10 @@
 from __future__ import annotations
 from datetime import date
+from typing import TypeVar
 from .commands import AddDocument, AddKnowledgeBase
 from .types import KnowledgeBaseName, DocumentId, LongStr
 
+Schema = TypeVar("Schema")
 
 class KnowledgeBase:
     def __init__(
@@ -59,3 +61,6 @@ class Document:
     @staticmethod
     def new_instance(command: AddDocument) -> "Document":
         return Document(id=command.id, content=command.content)
+
+    def to_schema(self, SchemaClass: Schema) -> Schema:
+        return SchemaClass(id=self.id, content=self.content)
