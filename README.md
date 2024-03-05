@@ -92,6 +92,9 @@ pdm test
 - `/knowledge_base/{knowledge_base_name}/document/?q={your_query}` : 
     - GET = get the documents that have similar content based on your query
 
+## System Design
+
+![system design](./docs/system_design.svg)
 ## Changelog
 
 - **v1**: <br> March 2024. <br>**Description**: Initial proposal by me.
