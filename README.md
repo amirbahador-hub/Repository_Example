@@ -205,3 +205,26 @@ The Clean Architecture Flow Diagram visualizes the layers of Clean Architecture 
 ![clean-arch-03](./docs/clean-arch-03.png)
 *source: https://stackoverflow.com/a/73788685
 
+## Libraries
+- [FastAPI](https://fastapi.tiangolo.com/): FastAPI is a high-level Python web framework.
+- [PyTest](https://docs.pytest.org/en/8.0.x/): PyTest is a testing Python framework.
+- [DependencyInjector>](https://python-dependency-injector.ets-labs.org/): Dependency Injector is a dependency injection framework for Python.
+
+
+
+
+## Future Improvements
+1. **Rollback Capabilities**:
+   - Our most useless component right now is the unit of work. Why? Because we haven't implemented a rollback mechanism for it. It's a crucial feature that can significantly enhance the reliability of our application. Currently, we lack any mechanism to handle failures or rollbacks if something goes wrong.
+
+2. **Data Storage to Domain Mappers**:
+   - Currently, our domain isn't fully utilized due to the absence of an active mapper. This limitation prevents us from effectively testing the behavior of the domain without repositories. Having a data storage to domain mapper would allow us to better test and validate the behavior of our domain.
+
+3. **Pipeline for Backpressure Handling**:
+   - Instead of relying on a message broker, we can consider implementing a proper pipeline. This approach becomes especially beneficial in a microservice architecture as it allows us to handle backpressure more easily. By using a pipeline, we can manage the flow of requests and responses more efficiently, ensuring optimal performance and stability.
+
+4. **Logging**:
+   - Although I included logs as a proof of concept, they are currently unused due to compatibility issues with some dependency Python versions. It's crucial to address this and ensure that our logging system is fully functional and compatible with all relevant dependencies. Proper logging is essential for monitoring and debugging purposes, providing valuable insights into the system's behavior.
+
+5. **Increased Test Coverage**:
+   - Testing is vital for maintaining a robust and reliable system. At present, we lack proper tests for Faiss, which is not ideal. It's important to invest in expanding our test coverage, especially for critical components like Faiss. Having comprehensive tests will help identify and address any potential issues, ensuring the stability and performance of our system. Remember, more tests are always beneficial!
