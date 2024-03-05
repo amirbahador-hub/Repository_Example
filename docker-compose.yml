@@ -1,8 +1,39 @@
 version: "3"
 
 services:
+
+  redis_pubsub:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: similarity-image
+    depends_on:
+      - redis
+    environment:
+      - API_ENV=consumer
+    volumes:
+      - ./src:/src
+      - ./tests:/tests
+    entrypoint:
+      - python
+      - src/main.py
+
+  api:
+    image: similarity-image
+    depends_on:
+      - redis_pubsub
+    volumes:
+      - ./src:/src
+      - ./tests:/tests
+    entrypoint:
+      - python
+      - src/main.py
+    ports:
+      - "8000:80"
+
   redis:
     image: redis/redis-stack:latest
     restart: always
     ports:
       - '6379:6379'
+

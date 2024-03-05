@@ -1,13 +1,21 @@
-FROM python:3.9-slim-buster
+# build stage
+FROM python:3.11 AS builder
 
-# RUN apt install gcc libpq (no longer needed bc we use psycopg2-binary)
+RUN pip install -U pip setuptools wheel
+RUN pip install pdm
 
-COPY requirements.txt /tmp/
-RUN pip install -r /tmp/requirements.txt
+COPY pyproject.toml pdm.lock README.md /project/
+COPY src/ /project/src
+COPY tests/ /project/tests
+COPY config/ /project/config
 
-RUN mkdir -p /src
-COPY src/ /src/
-RUN pip install -e /src
-COPY tests/ /tests/
+WORKDIR /project
+RUN mkdir __pypackages__ && pdm sync --prod --no-editable
 
-WORKDIR /src
+
+FROM python:3.11
+
+ENV PYTHONPATH=/project/pkgs
+COPY --from=builder /project/__pypackages__/3.11/lib /project/pkgs
+
+COPY --from=builder /project/__pypackages__/3.11/bin/* /bin/
