@@ -1,17 +1,94 @@
-# similarity
-# py-clean-arch
+<h1 align="center">
+  <br>
+  <a href="http://peykan.com/"><img src="docs/logo.jpeg" alt="Peykan" width="200"></a>
+  <br>
+    Peykan
+  <br>
+</h1>
 
-This is an example of implementing a Pokémon API based on the Clean Architecture in a Python project, referencing [**go-clean-arch**](https://github.com/bxcodec/go-clean-arch).
+<h4 align="center">A minimal Weather Application for <a href="http://peykan.com/" target="_blank">Peykan</a> Assginment.</h4>
+
+<p align="center">
+  <a href="https://img.shields.io/badge/test-pass-green">
+    <img src="https://img.shields.io/badge/test-pass-brightgreen"
+         alt="TestBadge">
+  </a>
+  <a href="https://img.shields.io/badge/python-3.10-blue">
+    <img src="https://img.shields.io/badge/python-3.10-blue"
+         alt="PythonVersionBadge">
+  </a>
+
+
+</p>
+
+<p align="center">
+  <a href="#project-setup">Project Setup</a> •
+  <a href="#endpoints">EndPoints</a> •
+  <a href="#architecture">Architecture</a> •
+  <a href="#libraries">Libraries</a> •
+  <a href="#future-improvements">Future Improvements</a>
+</p>
+
+
+## project setup
+
+1- compelete cookiecutter workflow (recommendation: leave project_slug empty) and go inside the project
+```
+cd peykan
+```
+
+2- SetUp venv
+```
+virtualenv -p python3.10 venv
+source venv/bin/activate
+```
+
+3- install Dependencies
+```
+pip install -r requirements_dev.txt
+pip install -r requirements.txt
+```
+
+4- create your env
+```
+cp .env.example .env
+```
+
+5- Create tables
+```
+python manage.py migrate
+```
+
+6- spin off docker compose
+```
+docker compose -f docker-compose.dev.yml up -d
+```
+
+7- run the project
+```
+python manage.py runserver
+```
+
+8- run the test
+```bash
+python manage.py test
+```
+
+## Endpoints
+- `/`: here you can access to swagger ui and view and test all REST API endpoints.
+- `/api/users/register` : you can create your acount with a POST request to this endpoint.
+- `/api/auth/jwt/login` : you can login to your acount with a POST request to this endpoint.
+- `/api/auth/jwt/refresh` : refresh token endpoint that gets a refresh token and give access token.
+- `/api/cv/` : 
+    - GET  = you can see your cv
+    - POST = create a your cv 
 
 ## Changelog
 
-- **v1**: Check out the [v1 branch](https://github.com/cdddg/py-clean-arch/tree/v1).<br> Archived in April 2021. <br>**Description**: Initial proposal by me.
+- **v1**: <br> March 2024. <br>**Description**: Initial proposal by me.
 
-- **v2**: Check out the [v2 branch](https://github.com/cdddg/py-clean-arch/tree/v2).<br> Archived in July 2023. <br>**Description**: Improvements from v1. See the [merged PRs from PR #1 to PR #10](https://github.com/cdddg/py-clean-arch/pulls?q=is%3Apr+is%3Aclosed+merged%3A2023-04-09..2023-08-15).
 
-- ✏️ **v3**: Current version on the `master` branch. <br>Merged to main in August 2023 and still evolving. <br>**Description**: Transition to Python-centric design from Go. Start with PR [#11](https://github.com/cdddg/py-clean-arch/pull/11) and see [all subsequent PRs](https://github.com/cdddg/py-clean-arch/pulls?q=is%3Apr+is%3Aclosed+merged%3A2023-08-16..2099-12-31).
-
-## Description
+## Architecture
 
 The Clean Architecture, popularized by [Uncle Bob](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html), emphasizes several foundational principles:
 
@@ -95,5 +172,3 @@ The Clean Architecture Flow Diagram visualizes the layers of Clean Architecture 
 ![clean-arch-03](./docs/clean-arch-03.png)
 *source: https://stackoverflow.com/a/73788685
 
-
-## How To Run This Project
