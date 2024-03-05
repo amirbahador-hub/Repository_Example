@@ -1,140 +1,106 @@
-# pylint: disable=no-self-use
-from __future__ import annotations
-from collections import defaultdict
-from datetime import date
-from typing import Dict, List
+import uuid
+from similarity.services import messagebus
+from similarity.services import handlers
+from similarity.domain import commands
 import pytest
-from allocation import bootstrap
-from allocation.domain import commands
-from allocation.service_layer import handlers
-from allocation.adapters import notifications, repository
-from allocation.service_layer import unit_of_work
+
+from similarity.services.unit_of_work import (
+    DocumentPersistenceUnitOfWork,
+    KnowledgeBasePersistenceUnitOfWork,
+)
 
 
-class FakeRepository(repository.AbstractRepository):
-    def __init__(self, products):
-        super().__init__()
-        self._products = set(products)
-
-    def _add(self, product):
-        self._products.add(product)
-
-    def _get(self, sku):
-        return next((p for p in self._products if p.sku == sku), None)
-
-    def _get_by_batchref(self, batchref):
-        return next(
-            (p for p in self._products for b in p.batches if b.reference == batchref),
-            None,
-        )
-
-
-class FakeUnitOfWork(unit_of_work.AbstractUnitOfWork):
+class FakeAdapter:
     def __init__(self):
-        self.products = FakeRepository([])
-        self.committed = False
+        self.db = dict()
 
-    def _commit(self):
-        self.committed = True
+    async def get_documents(self, name):
+        return self.db[name]
 
-    def rollback(self):
-        pass
+    async def get_knowledge_bases(self):
+        return list(self.db.keys())
+
+    async def add_knowledge_base(self, name):
+        self.db.update({name: []})
+        return name
+
+    async def delete_knowledge_base(self, name):
+        del self.db[name]
+        return name
+
+    async def add_document(self, document, name):
+        knowledge_base = self.db.get(name) or []
+        self.db.update({name: knowledge_base + [document.id]})
+
+    async def delete_document(self, document_id, name):
+        knowledge_base = self.db[name]
+        knowledge_base.remove(document_id)
+        self.db.update({name: knowledge_base})
 
 
-class FakeNotifications(notifications.AbstractNotifications):
-    def __init__(self):
-        self.sent = defaultdict(list)  # type: Dict[str, List[str]]
-
-    def send(self, destination, message):
-        self.sent[destination].append(message)
-
-
-def bootstrap_test_app():
-    return bootstrap.bootstrap(
-        start_orm=False,
-        uow=FakeUnitOfWork(),
-        notifications=FakeNotifications(),
-        publish=lambda *args: None,
+def bootstrap_message_bus(UnitOfWork, adapter):
+    return messagebus.MessageBus(
+        uow=UnitOfWork(adapter),
+        event_handlers=handlers.EVENT_HANDLERS,
+        command_handlers=handlers.COMMAND_HANDLERS,
     )
 
 
-class TestAddBatch:
-    def test_for_new_product(self):
-        bus = bootstrap_test_app()
-        bus.handle(commands.CreateBatch("b1", "CRUNCHY-ARMCHAIR", 100, None))
-        assert bus.uow.products.get("CRUNCHY-ARMCHAIR") is not None
-        assert bus.uow.committed
+class TestKnowledgeBase:
+    @pytest.mark.asyncio
+    async def test_for_new_knowledge_base(self):
+        db = FakeAdapter()
+        bus = bootstrap_message_bus(KnowledgeBasePersistenceUnitOfWork, db)
+        await bus.handle(commands.AddKnowledgeBase(name="book"))
+        assert "book" in await db.get_knowledge_bases()
 
-    def test_for_existing_product(self):
-        bus = bootstrap_test_app()
-        bus.handle(commands.CreateBatch("b1", "GARISH-RUG", 100, None))
-        bus.handle(commands.CreateBatch("b2", "GARISH-RUG", 99, None))
-        assert "b2" in [b.reference for b in bus.uow.products.get("GARISH-RUG").batches]
+    @pytest.mark.asyncio
+    async def test_for_remove_knowledge_base_happy_path(self):
+        db = FakeAdapter()
+        bus = bootstrap_message_bus(KnowledgeBasePersistenceUnitOfWork, db)
+        await bus.handle(commands.AddKnowledgeBase(name="book"))
+        assert "book" in await db.get_knowledge_bases()
+        await bus.handle(commands.RemoveKnowledgeBase(name="book"))
+        assert "book" not in await db.get_knowledge_bases()
+
+    @pytest.mark.asyncio
+    async def test_for_remove_knowledge_base_unhappy_path(self):
+        bus = bootstrap_message_bus(KnowledgeBasePersistenceUnitOfWork, FakeAdapter())
+        with pytest.raises(Exception):
+            await bus.handle(commands.RemoveKnowledgeBase(name="family"))
 
 
-class TestAllocate:
-    def test_allocates(self):
-        bus = bootstrap_test_app()
-        bus.handle(commands.CreateBatch("batch1", "COMPLICATED-LAMP", 100, None))
-        bus.handle(commands.Allocate("o1", "COMPLICATED-LAMP", 10))
-        [batch] = bus.uow.products.get("COMPLICATED-LAMP").batches
-        assert batch.available_quantity == 90
+class TestDocument:
 
-    def test_errors_for_invalid_sku(self):
-        bus = bootstrap_test_app()
-        bus.handle(commands.CreateBatch("b1", "AREALSKU", 100, None))
-
-        with pytest.raises(handlers.InvalidSku, match="Invalid sku NONEXISTENTSKU"):
-            bus.handle(commands.Allocate("o1", "NONEXISTENTSKU", 10))
-
-    def test_commits(self):
-        bus = bootstrap_test_app()
-        bus.handle(commands.CreateBatch("b1", "OMINOUS-MIRROR", 100, None))
-        bus.handle(commands.Allocate("o1", "OMINOUS-MIRROR", 10))
-        assert bus.uow.committed
-
-    def test_sends_email_on_out_of_stock_error(self):
-        fake_notifs = FakeNotifications()
-        bus = bootstrap.bootstrap(
-            start_orm=False,
-            uow=FakeUnitOfWork(),
-            notifications=fake_notifs,
-            publish=lambda *args: None,
+    @pytest.mark.asyncio
+    async def test_for_new_document_happy_path(self):
+        db = FakeAdapter()
+        bus = bootstrap_message_bus(DocumentPersistenceUnitOfWork, db)
+        _id = uuid.uuid4()
+        await bus.handle(
+            commands.AddDocument(id=_id, content="random string", name="book")
         )
-        bus.handle(commands.CreateBatch("b1", "POPULAR-CURTAINS", 9, None))
-        bus.handle(commands.Allocate("o1", "POPULAR-CURTAINS", 10))
-        assert fake_notifs.sent["stock@made.com"] == [
-            f"Out of stock for POPULAR-CURTAINS",
-        ]
+        uow = KnowledgeBasePersistenceUnitOfWork(db)
+        async with uow:
+            assert _id in await uow.repository.get("book")
 
+    @pytest.mark.asyncio
+    async def test_for_remove_document_happy_path(self):
+        db = FakeAdapter()
+        bus = bootstrap_message_bus(DocumentPersistenceUnitOfWork, db)
+        _id = uuid.uuid4()
+        await bus.handle(
+            commands.AddDocument(id=_id, content="random string", name="book")
+        )
+        await bus.handle(commands.RemoveDocument(id=_id, name="book"))
+        uow = KnowledgeBasePersistenceUnitOfWork(db)
+        async with uow:
+            assert _id not in await uow.repository.get("book")
 
-class TestChangeBatchQuantity:
-    def test_changes_available_quantity(self):
-        bus = bootstrap_test_app()
-        bus.handle(commands.CreateBatch("batch1", "ADORABLE-SETTEE", 100, None))
-        [batch] = bus.uow.products.get(sku="ADORABLE-SETTEE").batches
-        assert batch.available_quantity == 100
-
-        bus.handle(commands.ChangeBatchQuantity("batch1", 50))
-        assert batch.available_quantity == 50
-
-    def test_reallocates_if_necessary(self):
-        bus = bootstrap_test_app()
-        history = [
-            commands.CreateBatch("batch1", "INDIFFERENT-TABLE", 50, None),
-            commands.CreateBatch("batch2", "INDIFFERENT-TABLE", 50, date.today()),
-            commands.Allocate("order1", "INDIFFERENT-TABLE", 20),
-            commands.Allocate("order2", "INDIFFERENT-TABLE", 20),
-        ]
-        for msg in history:
-            bus.handle(msg)
-        [batch1, batch2] = bus.uow.products.get(sku="INDIFFERENT-TABLE").batches
-        assert batch1.available_quantity == 10
-        assert batch2.available_quantity == 50
-
-        bus.handle(commands.ChangeBatchQuantity("batch1", 25))
-
-        # order1 or order2 will be deallocated, so we'll have 25 - 20
-        assert batch1.available_quantity == 5
-        # and 20 will be reallocated to the next batch
-        assert batch2.available_quantity == 30
+    @pytest.mark.asyncio
+    async def test_for_remove_document_unhappy_path(self):
+        db = FakeAdapter()
+        bus = bootstrap_message_bus(DocumentPersistenceUnitOfWork, db)
+        _id = uuid.uuid4()
+        with pytest.raises(Exception):
+            await bus.handle(commands.RemoveDocument(id=_id, name="book"))

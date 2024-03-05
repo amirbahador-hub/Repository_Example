@@ -3,7 +3,7 @@ from fastapi import Depends, status, Body, APIRouter, Path
 from pydantic import BaseModel, Field
 from typing import Optional, Annotated
 import uuid
-from similarity.container import  APIContainer as Container
+from similarity.container import APIContainer as Container
 from similarity import views
 from similarity.domain.types import DocumentId, LongStr
 from similarity.services.messagebus import MessageBus
@@ -16,7 +16,9 @@ router = APIRouter(prefix="/knowledge_base")
 
 class DocumentUseCase(BaseModel):
     # id: Optional[DocumentId] = Depends(DocumentId(uuid.uuid4()))
-    id: DocumentId = Field(default_factory=uuid.uuid4,)
+    id: DocumentId = Field(
+        default_factory=uuid.uuid4,
+    )
     content: LongStr
 
 
@@ -31,7 +33,9 @@ async def new_document(
 ) -> DocumentId:
     command = AddDocument(name=name, **uc.dict())
     document = await bus.handle(command)
-    await publish("document.add", command) # TODO: we can use gather as well if we don't care about saving into redis first
+    await publish(
+        "document.add", command
+    )  # TODO: we can use gather as well if we don't care about saving into redis first
     return document.id
 
 
@@ -61,11 +65,7 @@ async def remove_document(
 async def get_documents(
     name: str = Path(..., title="KnowledgeBase Name", regex="^[a-z0-9_]+$"),
     bus: MessageBus = Depends(Provide[Container.document_bus]),
-    q: str | None = None
+    q: str | None = None,
 ) -> list[DocumentUseCase]:
-        documents = await views.similarity(
-            uow=bus.uow,
-            content=q,
-            name=name
-        )
-        return [doc.to_schema(DocumentUseCase) for doc in documents]
+    documents = await views.similarity(uow=bus.uow, content=q, name=name)
+    return [doc.to_schema(DocumentUseCase) for doc in documents]

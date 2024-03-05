@@ -6,6 +6,7 @@ from .types import KnowledgeBaseName, DocumentId, LongStr
 
 Schema = TypeVar("Schema")
 
+
 class KnowledgeBase:
     def __init__(
         self,

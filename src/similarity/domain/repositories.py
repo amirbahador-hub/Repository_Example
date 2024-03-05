@@ -8,6 +8,7 @@ class KnowledgeBaseRepository(Protocol):
         """
         retrive all of the documents for the given knowledge_base name
         """
+
     async def add(self) -> KnowledgeBase:
         """
         Add a single knowledge base to your collection and returns the object

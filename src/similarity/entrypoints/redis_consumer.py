@@ -18,6 +18,7 @@ from similarity.services import handlers, messagebus, unit_of_work
 
 logger = logging.getLogger(__name__)
 
+
 class MQContainer(DeclarativeContainer):
     redis = Singleton(AsyncRedis, **get_config("redis"))
     db = Singleton(FaissOrm)
@@ -31,10 +32,11 @@ class MQContainer(DeclarativeContainer):
         event_handlers=handlers.EVENT_HANDLERS,
     )
 
+
 @inject
 async def main(
     bus: MessageBus = Depends(Provide[MQContainer.document_faiss_bus]),
-    redis: redis.asyncio.Redis= Depends(Provide[MQContainer.redis])
+    redis: redis.asyncio.Redis = Depends(Provide[MQContainer.redis]),
 ):
     print("Redis pubsub setting up ...")
     pubsub = redis.pubsub(ignore_subscribe_messages=True)
@@ -56,7 +58,12 @@ async def handle_document_change(m, bus, redis):
         cmd = commands.RemoveDocument(**data)
         await bus.handle(cmd)
     elif channel == "document.get":
-        response = await similarity(content=data["query"], name=data["name"], uow=bus.uow)
+        response = await similarity(
+            content=data["query"], name=data["name"], uow=bus.uow
+        )
         print(response)
-        await redis.rpush(data["key"], json.dumps([{"content": res.content, "id": res.id} for res in response]))
+        await redis.rpush(
+            data["key"],
+            json.dumps([{"content": res.content, "id": res.id} for res in response]),
+        )
         await redis.expire(data["key"], 10)

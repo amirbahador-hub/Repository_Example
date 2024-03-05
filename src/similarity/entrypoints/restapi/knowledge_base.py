@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, status
-from similarity.container import  APIContainer as Container
+from similarity.container import APIContainer as Container
 from similarity.domain.types import KnowledgeBaseName
 from similarity.services.messagebus import MessageBus
 from dependency_injector.wiring import Provide, inject

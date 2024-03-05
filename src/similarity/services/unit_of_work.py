@@ -19,7 +19,7 @@ class KnowledgeBasePersistenceUnitOfWork:
     repository: KnowledgeBaseRepository
 
     def __init__(self, adapter) -> None:
-        self.adapter = adapter 
+        self.adapter = adapter
 
     async def __aenter__(self) -> None:
         self.repository = KnowledgeBaseRepository(self.adapter)
@@ -31,7 +31,7 @@ class DocumentPersistenceUnitOfWork:
     repository: DocumentRepository
 
     def __init__(self, adapter) -> None:
-        self.adapter = adapter 
+        self.adapter = adapter
 
     async def __aenter__(self) -> None:
         self.repository = DocumentRepository(self.adapter)

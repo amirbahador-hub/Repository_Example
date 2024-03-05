@@ -26,8 +26,20 @@ license = {text = "MIT"}
 [tool.pdm]
 distribution = false
 
+[tool.pytest.ini_options]
+pythonpath = [
+    "src",
+]
 
 [tool.pdm.scripts]
 start.cmd = "python src/main.py"
+test.cmd = "python -m pytest --tb=short"
 consume.cmd = "python src/main.py"
 consume.env = {APP_ENV="consumer"}
+
+
+[tool.pdm.dev-dependencies]
+test = [
+    "pytest>=7.0.1",
+    "pytest-asyncio>=0.23.5",
+]

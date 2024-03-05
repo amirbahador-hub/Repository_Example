@@ -13,8 +13,11 @@ logger = logging.getLogger(__name__)
 
 
 @inject
-async def publish(channel, message: Message | dict,
-    redis: redis.asyncio.Redis= Depends(Provide[Container.redis])):
+async def publish(
+    channel,
+    message: Message | dict,
+    redis: redis.asyncio.Redis = Depends(Provide[Container.redis]),
+):
     logging.info("publishing: channel=%s, event=%s", channel, message)
     if isinstance(message, Message):
         await redis.publish(channel, message.json())

@@ -23,10 +23,12 @@ async def remove_knowledge_base(
     uow: unit_of_work.AbstractUnitOfWork,
 ):
     async with uow:
-        document_ids= await uow.repository.get(cmd.name)
+        document_ids = await uow.repository.get(cmd.name)
         name = await uow.repository.delete(cmd.name)
         tasks = [
-            adapters.redis_publisher.publish("document.remove", {"id": id, "name": name})
+            adapters.redis_publisher.publish(
+                "document.remove", {"id": id, "name": name}
+            )
             for id in document_ids
         ]
         await asyncio.gather(*tasks)
