@@ -93,9 +93,25 @@ pdm test
     - GET = get the documents that have similar content based on your query
 
 ## System Design
-As depicted in the image below, this is our system design. The user interacts with an `HTTP server`, which efficiently utilizes `Redis` as the database, resulting in fast service. You might be wondering what happens with the `Faiss` and `ML model`, which can be slower. Well, we have cleverly hidden that complexity. Here's how it works: whenever a user interacts with `Redis`, if there is a need for anything `Faiss-related`, we simply send a message to the message broker while querying `Redis` simultaneously.
+As you can see in the picture below, this is our system design.
 
-The beauty of this design is that all the heavy lifting happens in the `background consumer`, handling the slow processes. Leveraging Redis as both the `database` and the `message broker` allows us to streamline the system, maximizing efficiency and maintaining a cohesive architecture.
+User Interaction:
+-----------------
+The user interacts with an HTTP server. The server utilizes Redis as the database, resulting in fast service.
+
+Handling Faiss and ML Model:
+----------------------------
+You might be wondering about the handling of Faiss and ML model, which can be slower. We have cleverly hidden that complexity. Here's how it works:
+
+1. Message Broker Integration:
+   - Whenever a user interacts with Redis, if there is a need for anything Faiss-related, we simultaneously send a message to the message broker while querying Redis.
+
+2. Background Consumer:
+   - All the slow processes related to Faiss and the ML model are handled in the background consumer.
+
+Redis as Database and Message Broker:
+-------------------------------------
+Since we already have Redis as the database, we have leveraged it as the message broker as well. This design allows us to streamline the system, maximize efficiency, and maintain a cohesive architecture.
 
 
 ![system design](./docs/system_design.svg)
