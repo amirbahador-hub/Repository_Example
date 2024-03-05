@@ -137,15 +137,14 @@ The Clean Architecture, popularized by [Uncle Bob](https://blog.cleancoder.com/u
 
 This project not only adheres to Uncle Bob's Clean Architecture principles but also incorporates modern adaptations and extended features to meet contemporary development needs:
 
-- **GraphQL vs HTTP**:<br>The `entrypoints` module contains two API interfaces. `graphql` provides for a robust GraphQL API, while `http` focuses on RESTful API routes and controls.
-- **RelationalDB vs NoSQL**:<br>The `repositories` module supports both relational and NoSQL databases. `relational_db` manages operations for databases like SQLite, MySQL, and PostgreSQL, whereas `nosql` manages operations for NoSQL databases like MongoDB and CouchDB.
+- **GraphQL vs HTTP**:<br>The `entrypoints` module contains two API interfaces. `graphql` provides for a robust GraphQL API, while `restapi` focuses on RESTful API routes and controls.
+- **Faiss vs Redis**:<br>The `repositories` module supports both Redis and Faiss databases. `adapters/faisss_db` manages operations for Faiss, whereas `adapters/redis_db` manages operations for redis.
 
 Apart from following Uncle Bob's Clean Architecture, this project also incorporates:
 
 - **Repository Pattern**:<br>An abstraction that simplifies the decoupling of the model layer from data storage, thereby promoting flexibility and maintainability in the codebase. [^1]
-- **Unit of Work Pattern**:<br>This pattern ensures that all operations within a single transaction are completed successfully, or none are completed at all. [^2]
 - **Dependency Injection Pattern**:<br>Helps in reducing direct dependencies between codes, increasing the testability and flexibility of modules. [^3]
-- **Asynchronous SQLalchemy**:<br>By utilizing the asynchronous capabilities of SQLAlchemy 2.0, database operations are optimized for performance and efficiently handle multitasking. [^4]
+- **Asynchronous Capabilities**:<br>By utilizing the asynchronous capabilities of Faiss and Redis, database operations are optimized for performance and efficiently handle multitasking. [^4]
 
 ### 🧱 Project Structure Overview & Clean Architecture Mapping
 
@@ -158,36 +157,38 @@ Here's a glimpse of the project's high-level structure, highlighting primary dir
 ```ini
 ./
 ├── ...
-├── src/
-│   ├── di/                   - Dependency injection configurations for managing dependencies.
-│   │   ├── dependency_injection.py
-│   │   └── unit_of_work.py
+├── src/similarity/
 │   │
 │   ├── entrypoints/          - External interfaces like HTTP & GraphQL endpoints.
 │   │   ├── graphql/          - GraphQL components for a flexible API.
-│   │   └── http/             - RESTful API routes and controllers.
+│   │   └── restapi/             - RESTful API routes and controllers.
 │   │                           ('Frameworks and Drivers' and part of 'Interface Adapters' in Clean Architecture)
 │   │
-│   ├── usecases/             - Contains application-specific business rules and implementations.
+│   ├── services/              - Contains application-specific business rules and implementations.
 │   │                           ('Use Cases' in Clean Architecture)
 │   │
-│   ├── repositories/         - Data interaction layer, converting domain data to/from database format.
-│   │   ├── nosql/            - Operations for NoSQL databases (e.g., MongoDB, CouchDB).
-│   │   └── relational_db/    - Operations for relational databases (e.g., SQLite, MySQL, PostgreSQL).
+│   ├── adapters/              - Data interaction layer, converting domain data to/from database format.
+│   │   ├── faiss_db           - Operations for Faiss.
+│   │   ├── redis_db           - Operations for Redis as database.
+│   │   └── redis_pub          - Operations for Redis pub/sub.
 │   │                           ('Interface Adapters' in Clean Architecture)
 │   │
-│   ├── models/               - Domain entities representing the business data.
+│   ├── domain/                - Domain entities representing the business data.
+│   │   ├── models             - Business concepts.
+│   │   ├── commands           - Business requests.
+│   │   ├── events             - Business events(not used!).
+│   │   └── repository         - Domain behaviors.
 │   │                           ('Entities' in Clean Architecture)
 │   │
-│   ├── common/               - Shared code and utilities.
-│   ├── settings/
-│   │   └── db/               - Database configurations.
+│   ├── utils.py              - Shared code and utilities.
+│   ├── config/
+│   │   └── default.yml       - Database configurations.
 │   │                           ('Frameworks and Drivers' in Clean Architecture)
 │   │
 │   └── main.py               - Main file to launch the application.
 │
 └── tests/
-    ├── api_db_test.bats      - BATs tests for API and database interactions.
+    ├── e2e/                  - End To End tests for testign application behaviors.
     ├── integration/          - Integration tests for testing module interactions.
     └── unit/                 - Unit tests for testing individual components in isolation.
 ```
