@@ -25,6 +25,7 @@
   <a href="#project-setup">Project Setup</a> •
   <a href="#endpoints">EndPoints</a> •
   <a href="#system-design">System Design</a> •
+  <a href="#changelog">ChangeLog</a> •
   <a href="#architecture">Architecture</a> •
   <a href="#libraries">Libraries</a> •
   <a href="#future-improvements">Future Improvements</a>
@@ -33,56 +34,63 @@
 
 ## project setup
 
-1- compelete cookiecutter workflow (recommendation: leave project_slug empty) and go inside the project
+### user setup
 ```
-cd peykan
+docker-compose up -d
+```
+### developer setup
+
+1- I'm using [pdm](https://pdm-project.org/latest/) as package manager
+```
+curl -sSL https://pdm-project.org/install-pdm.py | python3 -
 ```
 
-2- SetUp venv
+2- install Dependencies
 ```
-virtualenv -p python3.10 venv
-source venv/bin/activate
-```
-
-3- install Dependencies
-```
-pip install -r requirements_dev.txt
-pip install -r requirements.txt
+pdm install
 ```
 
-4- create your env
+3- add your secrets to .env file (not necessary)
 ```
-cp .env.example .env
-```
-
-5- Create tables
-```
-python manage.py migrate
+echo "APP_URL=http://localhost:800" > .env
 ```
 
-6- spin off docker compose
+4- config modification (not necessary)
 ```
-docker compose -f docker-compose.dev.yml up -d
+vim config/local.yml
 ```
 
-7- run the project
+5- setting up the infrustructure
 ```
-python manage.py runserver
+docker-compose -f docker-compose.dev.yml up -d
+```
+
+6- run the consumer server
+```
+pdm consume 
+```
+
+7- run the apis server
+```
+pdm start
 ```
 
 8- run the test
 ```bash
-python manage.py test
+pdm test
 ```
 
 ## Endpoints
-- `/`: here you can access to swagger ui and view and test all REST API endpoints.
-- `/api/users/register` : you can create your acount with a POST request to this endpoint.
-- `/api/auth/jwt/login` : you can login to your acount with a POST request to this endpoint.
-- `/api/auth/jwt/refresh` : refresh token endpoint that gets a refresh token and give access token.
-- `/api/cv/` : 
-    - GET  = you can see your cv
-    - POST = create a your cv 
+- `/docs/` : an online doc powered by swagger
+- `/graphql/` : a graphql interface for similarity search
+- `/knowledge_base/` : 
+    - POST = add a knowledge base
+    - DELETE = remove a knowledge base
+- `/knowledge_base/{knowledge_base_name}/document` : 
+    - POST = add a document to a knowledge base
+    - DELETE = remove a document from a knowledge base
+- `/knowledge_base/{knowledge_base_name}/document/?q={your_query}` : 
+    - GET = get the documents that have similar content based on your query
 
 ## Changelog
 
