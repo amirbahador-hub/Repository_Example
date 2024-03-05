@@ -1,20 +1,20 @@
 <h1 align="center">
   <br>
-  <a href="http://peykan.com/"><img src="docs/logo.jpeg" alt="Peykan" width="200"></a>
+  <a href="https://www.parloa.com/"><img src="docs/logo.jpeg" alt="Parloa" width="200"></a>
   <br>
-    Peykan
+    Parloa
   <br>
 </h1>
 
-<h4 align="center">A minimal Weather Application for <a href="http://peykan.com/" target="_blank">Peykan</a> Assginment.</h4>
+<h4 align="center">A minimal Similarity Application for <a href="http://parloa.com/" target="_blank">Parloa</a> Assginment.</h4>
 
 <p align="center">
   <a href="https://img.shields.io/badge/test-pass-green">
     <img src="https://img.shields.io/badge/test-pass-brightgreen"
          alt="TestBadge">
   </a>
-  <a href="https://img.shields.io/badge/python-3.10-blue">
-    <img src="https://img.shields.io/badge/python-3.10-blue"
+  <a href="https://img.shields.io/badge/python-3.11-blue">
+    <img src="https://img.shields.io/badge/python-3.11-blue"
          alt="PythonVersionBadge">
   </a>
 
@@ -24,6 +24,7 @@
 <p align="center">
   <a href="#project-setup">Project Setup</a> •
   <a href="#endpoints">EndPoints</a> •
+  <a href="#system-design">System Design</a> •
   <a href="#architecture">Architecture</a> •
   <a href="#libraries">Libraries</a> •
   <a href="#future-improvements">Future Improvements</a>
