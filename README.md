@@ -95,12 +95,12 @@ pdm test
 ## System Design
 As you can see in the picture below, this is our system design.
 
-User Interaction:
------------------
+### User Interaction:
+
 The user interacts with an HTTP server. The server utilizes Redis as the database, resulting in fast service.
 
-Handling Faiss and ML Model:
-----------------------------
+### Handling Faiss and ML Model:
+
 You might be wondering about the handling of Faiss and ML model, which can be slower. We have cleverly hidden that complexity. Here's how it works:
 
 1. Message Broker Integration:
@@ -109,8 +109,8 @@ You might be wondering about the handling of Faiss and ML model, which can be sl
 2. Background Consumer:
    - All the slow processes related to Faiss and the ML model are handled in the background consumer.
 
-Redis as Database and Message Broker:
--------------------------------------
+### Redis as Database and Message Broker:
+
 Since we already have Redis as the database, we have leveraged it as the message broker as well. This design allows us to streamline the system, maximize efficiency, and maintain a cohesive architecture.
 
 
