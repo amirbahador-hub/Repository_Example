@@ -4,7 +4,7 @@ from dataclasses import asdict
 import redis
 
 from similarity.services.messagebus import Message
-from similarity.container import Container
+from similarity.container import APIContainer as Container
 from fastapi import Depends
 from dependency_injector.wiring import Provide, inject
 

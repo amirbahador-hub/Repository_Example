@@ -5,23 +5,15 @@ from similarity.domain import models
 from similarity.domain.types import DocumentId, KnowledgeBaseName
 
 
-
 class FaissOrm:
     def __init__(self):
-
-        self.db = FAISS.load_local("faiss_index", self.get_model())
+        self.db = FAISS.from_documents([Document("init")], self.get_model(), ids=["init"])
 
     async def _ingest(self, *, sentences: list[str], knowledge_base_name: str, ids: list[str]) -> None:
         documents = [Document(page_content=sentence, metadata=dict(id=id, collection=knowledge_base_name)) for sentence, id in zip(sentences, ids)]
-        if not self.db:
-            self.db = await FAISS.afrom_documents(documents, self.get_model(), ids=ids)
-        else:
-            await self.db.aadd_documents(documents, ids=ids)
-
-        self.db.save_local("faiss_index")
+        await self.db.aadd_documents(documents, ids=ids)
 
     async def get_similarity(self, query: str, name: str) -> list[models.Document]:
-        self.db = FAISS.load_local("faiss_index", self.get_model())
         docs = await self.db.asimilarity_search_with_score(query, filter=dict(collection=name))
         return [models.Document(id=doc.metadata["id"], content=doc.page_content) for doc, _ in docs]
 
@@ -35,7 +27,6 @@ class FaissOrm:
     async def delete_document(self, document_id: DocumentId, name: KnowledgeBaseName):
         try:
             self.db.delete([str(document_id)])
-            self.db.save_local("faiss_index")
         except ValueError:
             #raise exceptions.InvalidDocument(f"{document_id} dosen't exsist!!") 
             print(f"{document_id} dosen't exsist!!")

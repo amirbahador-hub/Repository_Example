@@ -3,7 +3,7 @@ from fastapi import Depends, status, Body, APIRouter, Path
 from pydantic import BaseModel, Field
 from typing import Optional, Annotated
 import uuid
-from similarity.container import Container
+from similarity.container import  APIContainer as Container
 from similarity import views
 from similarity.domain.types import DocumentId, LongStr
 from similarity.services.messagebus import MessageBus
@@ -60,7 +60,7 @@ async def remove_document(
 @inject
 async def get_documents(
     name: str = Path(..., title="KnowledgeBase Name", regex="^[a-z0-9_]+$"),
-    bus: MessageBus = Depends(Provide[Container.document_faiss_bus]),
+    bus: MessageBus = Depends(Provide[Container.document_bus]),
     q: str | None = None
 ) -> list[DocumentUseCase]:
         documents = await views.similarity(

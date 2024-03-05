@@ -2,7 +2,7 @@ import strawberry
 from similarity.domain.types import KnowledgeBaseName, LongStr
 
 from fastapi import Depends
-from similarity.container import Container
+from similarity.container import APIContainer as Container
 from similarity.services.messagebus import MessageBus
 from similarity import views
 from dependency_injector.wiring import Provide, inject
@@ -16,7 +16,7 @@ class Document:
 
 @inject
 def get_uow(
-        bus: MessageBus = Depends(Provide[Container.document_faiss_bus]),
+        bus: MessageBus = Depends(Provide[Container.document_bus]),
     ):
         return bus.uow
 

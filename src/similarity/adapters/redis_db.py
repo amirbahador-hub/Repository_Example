@@ -1,4 +1,7 @@
 from redis.asyncio import Redis as AsyncRedis
+import uuid
+import json
+from similarity import adapters 
 from similarity.domain.exceptions import InvalidKnowledgeBaseName, InvalidDocument
 from similarity.domain.models import Document
 from similarity.domain.types import DocumentId, KnowledgeBaseName
@@ -52,3 +55,10 @@ class RedisAdapter:
         if not isinstance(ids, list):
             raise InvalidKnowledgeBaseName("Knowledge Base Dosen't Exists!")
         return ids
+
+    async def get_similarity(self, query: str, name: str) -> list[Document]:
+        key = f"similarity-response-{str(uuid.uuid4())}"
+        await adapters.redis_publisher.publish("document.get", {"query": query, "name": name, "key": key})
+        responses = await self.redis.blpop(key, 100)
+        responses = json.loads(responses[-1])
+        return [Document(id=DocumentId(res["id"]), content=res["content"]) for res in responses]

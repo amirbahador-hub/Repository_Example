@@ -3,7 +3,6 @@ from lib.config import get_config
 from similarity import entrypoints as router
 from similarity.entrypoints.error import init_error_handler
 
-from similarity.container import Container
 from fastapi import FastAPI
 import uvicorn
 import asyncio
@@ -16,19 +15,26 @@ app.include_router(router.similarity_router, prefix='/graphql', tags=['GraphQL']
 init_error_handler(app, get_config("email"))
 
 # Insert Container (IoC)
-container = Container()
-container.wire(modules=[router.restapi.knowledge_base, router.restapi.document, router.redis_router, router.graphql.query])
 
-app.container = container
-db = container.db()
 
 def start_http_server():
+    from similarity.container import APIContainer
+    container = APIContainer()
+    app.container = container
+    container.wire(modules=[router.restapi.knowledge_base, router.restapi.document, router.graphql.query])
     uvicorn.run("main:app", **get_config("uvicorn"))
+
+def start_consumer():
+    from similarity.entrypoints import redis_consumer
+    container = redis_consumer.MQContainer()
+    container.wire(modules=[redis_consumer])
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(redis_consumer.main())
 
 if __name__ == "__main__":
     # setup_logging()
     loop = asyncio.get_event_loop()
     if get_config("app_env") == "consumer":
-        loop.run_until_complete(router.redis_consumer.main())
+        start_consumer()
     else:
         start_http_server()
