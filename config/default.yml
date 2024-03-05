@@ -1,4 +1,5 @@
 app_env: "${oc.env:APP_ENV, ''}"
+app_url: "${oc.env:APP_URL, 'http://localhost:8000'}"
 
 uvicorn:
   host: "0.0.0.0"

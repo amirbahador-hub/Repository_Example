@@ -60,7 +60,10 @@ class RedisAdapter:
             "document.get", {"query": query, "name": name, "key": key}
         )
         responses = await self.redis.blpop(key, 100)
-        responses = json.loads(responses[-1])
+        if responses:
+            responses = json.loads(responses[-1])
+        else:
+            responses = []
         return [
             Document(id=DocumentId(res["id"]), content=res["content"])
             for res in responses

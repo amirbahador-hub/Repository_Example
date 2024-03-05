@@ -9,7 +9,7 @@ class FaissOrm:
     def __init__(self):
         self.db = FAISS.from_documents(
             [Document("init")], self.get_model(), ids=["init"]
-        )
+        ) # TODO: initialize this using load_local instead of adding randon init document
 
     async def _ingest(
         self, *, sentences: list[str], knowledge_base_name: str, ids: list[str]

@@ -28,7 +28,7 @@ distribution = false
 
 [tool.pytest.ini_options]
 pythonpath = [
-    "src",
+    "","src","lib"
 ]
 
 [tool.pdm.scripts]
@@ -42,4 +42,6 @@ consume.env = {APP_ENV="consumer"}
 test = [
     "pytest>=7.0.1",
     "pytest-asyncio>=0.23.5",
+    "requests>=2.31.0",
+    "tenacity>=8.2.3",
 ]

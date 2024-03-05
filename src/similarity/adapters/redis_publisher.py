@@ -18,9 +18,8 @@ async def publish(
     message: Message | dict,
     redis: redis.asyncio.Redis = Depends(Provide[Container.redis]),
 ):
-    logging.info("publishing: channel=%s, event=%s", channel, message)
+    print(f"publishing: channel={channel}, event={message}")
     if isinstance(message, Message):
         await redis.publish(channel, message.json())
     else:
         await redis.publish(channel, json.dumps(message))
-    print("PUBLISHED")

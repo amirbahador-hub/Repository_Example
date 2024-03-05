@@ -19,8 +19,6 @@ app.include_router(
 )
 init_error_handler(app, get_config("email"))
 
-# Insert Container (IoC)
-
 
 def start_http_server():
     from similarity.container import APIContainer
@@ -34,7 +32,7 @@ def start_http_server():
             router.graphql.query,
         ]
     )
-    uvicorn.run("main:app", **get_config("uvicorn"))
+    uvicorn.run("main:app", **get_config("uvicorn")) #TODO: we can move this outside
 
 
 def start_consumer():
@@ -47,7 +45,7 @@ def start_consumer():
 
 
 if __name__ == "__main__":
-    # setup_logging()
+    # setup_logging() NOTE: python 3.12.2 logger is not compatible with our dependencies
     loop = asyncio.get_event_loop()
     if get_config("app_env") == "consumer":
         start_consumer()
